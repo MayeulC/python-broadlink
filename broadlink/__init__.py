@@ -418,46 +418,30 @@ class a1(device):
     if err == 0:
       data = {}
       payload = self.decrypt(bytes(response[0x38:]))
-      if type(payload[0x4]) == int:
-        data['temperature'] = (payload[0x4] * 10 + payload[0x5]) / 10.0
-        data['humidity'] = (payload[0x6] * 10 + payload[0x7]) / 10.0
-        light = payload[0x8]
-        air_quality = payload[0x0a]
-        noise = payload[0xc]
-      else:
-        data['temperature'] = (ord(payload[0x4]) * 10 + ord(payload[0x5])) / 10.0
-        data['humidity'] = (ord(payload[0x6]) * 10 + ord(payload[0x7])) / 10.0
-        light = ord(payload[0x8])
-        air_quality = ord(payload[0x0a])
-        noise = ord(payload[0xc])
-      if light == 0:
-        data['light'] = 'dark'
-      elif light == 1:
-        data['light'] = 'dim'
-      elif light == 2:
-        data['light'] = 'normal'
-      elif light == 3:
-        data['light'] = 'bright'
-      else:
-        data['light'] = 'unknown'
-      if air_quality == 0:
-        data['air_quality'] = 'excellent'
-      elif air_quality == 1:
-        data['air_quality'] = 'good'
-      elif air_quality == 2:
-        data['air_quality'] = 'normal'
-      elif air_quality == 3:
-        data['air_quality'] = 'bad'
-      else:
-        data['air_quality'] = 'unknown'
-      if noise == 0:
-        data['noise'] = 'quiet'
-      elif noise == 1:
-        data['noise'] = 'normal'
-      elif noise == 2:
-        data['noise'] = 'noisy'
-      else:
-        data['noise'] = 'unknown'
+      payload = [c if type(c) == int else ord(c) for c in payload]
+      data['temperature'] = (payload[0x4] * 10 + payload[0x5]) / 10.0
+      data['humidity'] = (payload[0x6] * 10 + payload[0x7]) / 10.0
+      data['light'] = payload[0x8]
+      data['air_quality'] = payload[0x0a]
+      data['noise'] = payload[0xc]
+      keymap = {
+      'light': {
+        0: 'dark',
+        1: 'dim',
+        2: 'normal',
+        3: 'bright'},
+      'air_quality': {
+        0: 'excellent',
+        1: 'good',
+        2: 'normal',
+        3: 'bad'}
+      'noise': {
+        0: 'quiet',
+        1: 'normal',
+        2: 'noisy'}
+      for key in keymap:
+      data[key] = keymap[key].get(data[key]), 'unknown)
+
       return data
 
   def check_sensors_raw(self):
