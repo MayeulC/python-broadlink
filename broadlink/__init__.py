@@ -52,10 +52,9 @@ def gendevice(devtype, host, mac):
           dooya: [0x4E4D]  # Dooya DT360E (DOOYA_CURTAIN_V2)
           }
 
-  # Look for the class associated to devtype in devices
-  [deviceClass] = [dev for dev in devices if devtype in devices[dev]] or [None]
-  if deviceClass is None:
-    return device(host=host, mac=mac, devtype=devtype)
+  # Look for the class associated to devtype in devices.
+  # If no match is found, use the generic device class.
+  [deviceClass] = [dev for dev in devices if devtype in devices[dev]] or [device]
   return deviceClass(host=host, mac=mac, devtype=devtype)
 
 def discover(timeout=None, local_ip_address=None):
