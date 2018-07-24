@@ -590,32 +590,33 @@ class hysen(device):
   # Get full status (including timer schedule)
   def get_full_status(self):
     payload = self.send_request(bytearray([0x01,0x03,0x00,0x00,0x00,0x16]))    
-    data = {}
-    data['remote_lock'] =  payload[3] & 1
-    data['power'] =  payload[4] & 1
-    data['active'] =  (payload[4] >> 4) & 1
-    data['temp_manual'] =  (payload[4] >> 6) & 1
-    data['room_temp'] =  (payload[5] & 255)/2.0
-    data['thermostat_temp'] =  (payload[6] & 255)/2.0
-    data['auto_mode'] =  payload[7] & 15
-    data['loop_mode'] =  (payload[7] >> 4) & 15
-    data['sensor'] = payload[8]
-    data['osv'] = payload[9]
-    data['dif'] = payload[10]
-    data['svh'] = payload[11]
-    data['svl'] = payload[12]
-    data['room_temp_adj'] = ((payload[13] << 8) + payload[14])/2.0
+    data = {
+        'remote_lock':  payload[3] & 1,
+        'power':  payload[4] & 1,
+        'active': (payload[4] >> 4) & 1,
+        'temp_manual': (payload[4] >> 6) & 1,
+        'room_temp': (payload[5] & 255)/2.0,
+        'thermostat_temp':  (payload[6] & 255)/2.0,
+        'auto_mode':  payload[7] & 15,
+        'loop_mode':  (payload[7] >> 4) & 15,
+        'sensor': payload[8],
+        'osv': payload[9],
+        'dif': payload[10],
+        'svh': payload[11],
+        'svl': payload[12],
+        'room_temp_adj': ((payload[13] << 8) + payload[14])/2.0,
+        'fre': payload[15],
+        'poweron': payload[16],
+        'unknown': payload[17],
+        'external_temp': (payload[18] & 255)/2.0,
+        'hour': payload[19],
+        'min': payload[20],
+        'sec': payload[21],
+        'dayofweek': payload[22]
+    }
     if data['room_temp_adj'] > 32767:
       data['room_temp_adj'] = 32767 - data['room_temp_adj']
-    data['fre'] = payload[15]
-    data['poweron'] = payload[16]
-    data['unknown'] = payload[17]
-    data['external_temp'] = (payload[18] & 255)/2.0
-    data['hour'] =  payload[19]
-    data['min'] =  payload[20]
-    data['sec'] =  payload[21]
-    data['dayofweek'] =  payload[22]
-    
+
     weekday = []
     for i in range(0, 6):
       weekday.append({'start_hour':payload[2*i + 23], 'start_minute':payload[2*i + 24],'temp':payload[i + 39]/2.0})
